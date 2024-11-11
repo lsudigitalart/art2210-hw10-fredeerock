@@ -2,59 +2,41 @@ let particles = [];
 
 function setup() {
   createCanvas(400, 400);
+
 }
 
 function draw() {
-  background(255);
-  
-  // Remove particles that are fully transparent
-  particles = particles.filter(particle => particle.opacity > 0);
-  
-  for (let particle of particles) {
-    particle.update();
-    particle.display();
-  }
-}
+  background(200);
 
-function mousePressed() {
-  for (let i = 0; i < 20; i++) { // Create 20 particles on each click
-    particles.push(new Particle(mouseX, mouseY));
+  if(mouseIsPressed) {
+    particleArray.push(new Particle(mouseX, mouseY));
   }
+
+  for(let i = particles.length - 1; i >= 0; i--) { // Looping backwards to safely remove particles
+    particles[i].display();
+    if (particles[i].x < 0 || particles[i].x > width || particles[i].y < 0 || particles[i].y > height) {
+      particles.splice(i, 1);
+    }
+  }
+
 }
 
 class Particle {
-  constructor(x, y) {
+
+  constructor (x, y) {
     this.x = x;
     this.y = y;
-    this.vx = random(-2, 2);
-    this.vy = random(-2, 2);
-    this.opacity = 255; // Initialize opacity
-  }
-
-  update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    
-    let bounced = false;
-
-    // Bounce off edges and reduce opacity
-    if (this.x < 0 || this.x > width) {
-      this.vx *= -1;
-      bounced = true;
-    }
-    if (this.y < 0 || this.y > height) {
-      this.vy *= -1;
-      bounced = true;
-    }
-
-    if (bounced) {
-      this.opacity -= 25; // Decrease opacity on bounce
-      this.opacity = max(this.opacity, 0); // Ensure opacity doesn't go below 0
-    }
+    this.speedX = random(-3, 3);
+    this.speedY = random(-3, 3);
   }
 
   display() {
-    fill(0, this.opacity);
-    ellipse(this.x, this.y, 10, 10);
+    noStroke();
+    fill(0);
+    ellipse(this.x, this.y, 10);
+    this.x += this.speedX;
+    this.y += this.speedY;
   }
+
 }
+
