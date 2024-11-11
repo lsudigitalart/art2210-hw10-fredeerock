@@ -1,95 +1,60 @@
-// Create an empty array to store Pokémon objects
-var pokemonArray = [];
+let particles = [];
 
-// This function sets up the initial environment
 function setup() {
-  // Create a canvas of 400x400 pixels
   createCanvas(400, 400);
-  
-  // Add 100 Pokémon objects to the pokemonArray
-  for (var i = 0; i < 100; i++) {
-    // Create a new Pokémon at a random position and add it to the array
-    var x = random(width);
-    var y = random(height);
-    var pokemon = new Pokemon(x, y);
-    pokemonArray.push(pokemon);
-  }
 }
 
-// This function is called repeatedly to draw the canvas
 function draw() {
-  // Set the background color to white
   background(255);
   
-  // Loop through each Pokémon in the array and display it
-  for (var i = 0; i < pokemonArray.length; i++) {
-    var pokemon = pokemonArray[i];
-    pokemon.display();
+  // Remove particles that are fully transparent
+  particles = particles.filter(particle => particle.opacity > 0);
+  
+  for (let particle of particles) {
+    particle.update();
+    particle.display();
   }
 }
 
-// This function is called when the mouse is pressed
 function mousePressed() {
-  // Loop through each Pokémon in the array
-  for (var i = 0; i < pokemonArray.length; i++) {
-    var pokemon = pokemonArray[i];
-    // Check if the Pokémon was clicked
-    if (pokemon.isClicked(mouseX, mouseY)) {
-      // Turn the clicked Pokémon into a Pokéball
-      pokemon.turnIntoPokeball();
-    }
+  for (let i = 0; i < 20; i++) { // Create 20 particles on each click
+    particles.push(new Particle(mouseX, mouseY));
   }
 }
 
-// Define a Pokémon class
-function Pokemon(x, y) {
-  // Initialize the Pokémon object
-  this.x = x; // X-coordinate of the Pokémon
-  this.y = y; // Y-coordinate of the Pokémon
-  this.isPokeball = false; // Boolean to check if it's a Pokéball
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.vx = random(-2, 2);
+    this.vy = random(-2, 2);
+    this.opacity = 255; // Initialize opacity
+  }
 
-  // Method to display the Pokémon
-  this.display = function() {
-    if (this.isPokeball) {
-      this.drawPokeball(); // Draw a Pokéball if it is a Pokéball
-    } else {
-      this.drawSquirtle(); // Otherwise, draw a Squirtle
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    
+    let bounced = false;
+
+    // Bounce off edges and reduce opacity
+    if (this.x < 0 || this.x > width) {
+      this.vx *= -1;
+      bounced = true;
     }
-  };
+    if (this.y < 0 || this.y > height) {
+      this.vy *= -1;
+      bounced = true;
+    }
 
-  // Method to check if the Pokémon was clicked
-  this.isClicked = function(mx, my) {
-    // Calculate the distance between the mouse and the Pokémon
-    var distance = dist(mx, my, this.x, this.y);
-    return distance < 25;
-  };
+    if (bounced) {
+      this.opacity -= 25; // Decrease opacity on bounce
+      this.opacity = max(this.opacity, 0); // Ensure opacity doesn't go below 0
+    }
+  }
 
-  // Method to turn the Pokémon into a Pokéball
-  this.turnIntoPokeball = function() {
-    this.isPokeball = true;
-  };
-
-  // Placeholder method to draw a Pokéball
-  this.drawPokeball = function() {
-    fill(255, 0, 0);
-    arc(this.x, this.y, 50, 50, PI, 0); // Top half
-    fill(255);
-    arc(this.x, this.y, 50, 50, 0, PI); // Bottom half
-    fill(0);
-    ellipse(this.x, this.y, 10, 10); // Center button
-  };
-
-  // Placeholder method to draw a Squirtle
-  this.drawSquirtle = function() {
-    fill(0, 191, 255);
-    ellipse(this.x, this.y, 50, 50); // Body
-    fill(255);
-    ellipse(this.x - 10, this.y - 10, 10, 10); // Left eye
-    ellipse(this.x + 10, this.y - 10, 10, 10); // Right eye
-    fill(0);
-    ellipse(this.x - 10, this.y - 10, 5, 5); // Left pupil
-    ellipse(this.x + 10, this.y - 10, 5, 5); // Right pupil
-    fill(255, 165, 0);
-    ellipse(this.x, this.y + 10, 30, 20); // Shell
-  };
+  display() {
+    fill(0, this.opacity);
+    ellipse(this.x, this.y, 10, 10);
+  }
 }
