@@ -1,34 +1,47 @@
-var myArray = ["bluejay", "cardinal", "chick"];
-var birdColor = "red";
-var birdDisplayed;
+let particles = [];
 
 function setup() {
   createCanvas(400, 400);
-  print(myArray[3])
 }
 
 function draw() {
-  background(255);
-  fill(birdColor);
-  ellipse(200, 200, 50, 50); // body
-  ellipse(200, 180, 30, 30); // head
-  fill(0);
-  ellipse(195, 175, 5, 5); // left eye
-  ellipse(205, 175, 5, 5); // right eye
-  fill(255, 0, 0);
-  triangle(200, 180, 190, 190, 210, 190); // beak
-  fill(0)
-  textSize(32);
+  background(200);
 
-  if (birdColor == "blue") {
-    birdDisplayed = myArray[0];
-  }
-  if (birdColor == "red") {
-    birdDisplayed = myArray[1];
-  }
-  if (birdColor == "yellow") {
-    birdDisplayed = myArray[2];
+  // Create new particles when mouse is pressed
+  if (mouseIsPressed) {
+    particles.push(new Particle(mouseX, mouseY));
   }
 
-  text(birdDisplayed, width/2-50, 250);
+  // Update and show all particles
+  for (let i = particles.length - 1; i >= 0; i--) { // Looping backwards to safely remove particles
+    particles[i].display();
+
+    // Remove particles that move off screen
+    if (particles[i].x < 0 || particles[i].x > width || particles[i].y < 0 || particles[i].y > height) {
+      particles.splice(i, 1);
+    }
+  }
+}
+
+class Particle {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+
+    // Random speed for each particle
+    this.speedX = random(-3, 3);
+    this.speedY = random(-3, 3);
+  }
+
+  display() {
+    
+    // Draw the particle as a black circle
+    noStroke();
+    fill(0);
+    ellipse(this.x, this.y, 10);
+
+    // Update the particle's position
+    this.x += this.speedX;
+    this.y += this.speedY;
+  }
 }
