@@ -1,34 +1,69 @@
-var myArray = ["bluejay", "cardinal", "chick"];
-var birdColor = "red";
-var birdDisplayed;
+let pokemonArray = [];
 
 function setup() {
   createCanvas(400, 400);
-  print(myArray[3])
+  for (let i = 0; i < 100; i++) {
+    pokemonArray.push(new Pokemon(random(width), random(height)));
+  }
 }
 
 function draw() {
   background(255);
-  fill(birdColor);
-  ellipse(200, 200, 50, 50); // body
-  ellipse(200, 180, 30, 30); // head
-  fill(0);
-  ellipse(195, 175, 5, 5); // left eye
-  ellipse(205, 175, 5, 5); // right eye
-  fill(255, 0, 0);
-  triangle(200, 180, 190, 190, 210, 190); // beak
-  fill(0)
-  textSize(32);
+  for (let pokemon of pokemonArray) {
+    pokemon.display();
+  }
+}
 
-  if (birdColor == "blue") {
-    birdDisplayed = myArray[0];
+function mousePressed() {
+  for (let pokemon of pokemonArray) {
+    if (pokemon.isClicked(mouseX, mouseY)) {
+      pokemon.turnIntoPokeball();
+    }
   }
-  if (birdColor == "red") {
-    birdDisplayed = myArray[1];
-  }
-  if (birdColor == "yellow") {
-    birdDisplayed = myArray[2];
+}
+
+class Pokemon {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.isPokeball = false;
   }
 
-  text(birdDisplayed, width/2-50, 250);
+  display() {
+    if (this.isPokeball) {
+      this.drawPokeball();
+    } else {
+      this.drawSquirtle();
+    }
+  }
+
+  isClicked(mx, my) {
+    return dist(mx, my, this.x, this.y) < 25;
+  }
+
+  turnIntoPokeball() {
+    this.isPokeball = true;
+  }
+
+  drawSquirtle() {
+    fill(0, 191, 255);
+    ellipse(this.x, this.y, 50, 50); // Body
+    fill(255);
+    ellipse(this.x - 10, this.y - 10, 10, 10); // Left eye
+    ellipse(this.x + 10, this.y - 10, 10, 10); // Right eye
+    fill(0);
+    ellipse(this.x - 10, this.y - 10, 5, 5); // Left pupil
+    ellipse(this.x + 10, this.y - 10, 5, 5); // Right pupil
+    fill(255, 165, 0);
+    ellipse(this.x, this.y + 10, 30, 20); // Shell
+  }
+
+  drawPokeball() {
+    fill(255, 0, 0);
+    arc(this.x, this.y, 50, 50, PI, 0); // Top half
+    fill(255);
+    arc(this.x, this.y, 50, 50, 0, PI); // Bottom half
+    fill(0);
+    ellipse(this.x, this.y, 10, 10); // Center button
+  }
 }
